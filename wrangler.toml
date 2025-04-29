@@ -1,0 +1,8 @@
+name = "aia"
+compatibility_date = "2024-04-29"
+main = "./src/index.js"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "aia_db"
+database_id = "local"

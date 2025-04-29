@@ -1,0 +1,29 @@
+# Node & Cloudflare
+node_modules/
+.wrangler/
+wrangler.toml.local
+
+# Python
+__pycache__/
+*.pyc
+
+
+# VSCode/IDE
+.vscode/
+.idea/
+.DS_Store
+
+# System
+*.log
+
+# OS
+Thumbs.db
+
+# Local env
+.env
+.env.*
+
+# Mac
+*.DS_Store
+
+# Others (add as needed)
