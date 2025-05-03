@@ -5,4 +5,4 @@ main = "./src/index.js"
 [[d1_databases]]
 binding = "DB"
 database_name = "aia_db"
-database_id = "local"
+database_id = "03f54b4a-a0ff-4d21-a4ed-a060fa1c217a" # 请将此替换为您的实际 Cloudflare D1 数据库 ID
