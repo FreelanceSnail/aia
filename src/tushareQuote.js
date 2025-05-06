@@ -6,21 +6,17 @@ import axios from 'axios';
 
 // 配置Tushare后端API的baseURL
 const BASE_URL = 'https://api.tushare.pro';
-const TUSHARE_TOKEN = process.env.TUSHARE_TOKEN || '';
-
-if (!TUSHARE_TOKEN) {
-    throw new Error('请设置TUSHARE_TOKEN环境变量为你的tushare token');
-}
 
 /**
  * 获取股票报价
  * @param {string} symbol 股票代码
+ * @param {string} token tushare token
  * @returns {Promise<{ts_code: string, price: number, preclose: number} | null>} 行情数据字典，查不到返回 null
  */
-async function getStockQuote(symbol) {
+async function getStockQuote(symbol, token) {
     const body = {
         api_name: 'daily',
-        token: TUSHARE_TOKEN,
+        token,
         params: { ts_code: symbol },
         fields: ''
     };
@@ -45,12 +41,13 @@ async function getStockQuote(symbol) {
 /**
  * 获取期权报价
  * @param {string} symbol 期权代码
+ * @param {string} token tushare token
  * @returns {Promise<{ts_code: string, price: number, preclose: number} | null>} 行情数据字典，查不到返回 null
  */
-async function getOptionQuote(symbol) {
+async function getOptionQuote(symbol, token) {
     const body = {
         api_name: 'opt_daily',
-        token: TUSHARE_TOKEN,
+        token,
         params: { ts_code: symbol },
         fields: ''
     };
@@ -75,12 +72,13 @@ async function getOptionQuote(symbol) {
 /**
  * 获取期货报价
  * @param {string} symbol 期货代码
+ * @param {string} token tushare token
  * @returns {Promise<{ts_code: string, price: number, preclose: number} | null>} 行情数据字典，查不到返回 null
  */
-async function getFutureQuote(symbol) {
+async function getFutureQuote(symbol, token) {
     const body = {
         api_name: 'fut_daily',
-        token: TUSHARE_TOKEN,
+        token,
         params: { ts_code: symbol },
         fields: ''
     };
@@ -123,17 +121,18 @@ function detectSymbolType(symbol) {
 /**
  * 通用报价接口，自动识别symbol类型
  * @param {string} symbol 代码
+ * @param {string} token tushare token
  * @returns {Promise<{ts_code: string, price: number, preclose: number} | null>} 行情数据字典，查不到返回 null
  */
-async function getQuote(symbol) {
+async function getQuote(symbol, token) {
     const type = detectSymbolType(symbol);
     switch(type) {
         case 'stock':
-            return getStockQuote(symbol);
+            return getStockQuote(symbol, token);
         case 'option':
-            return getOptionQuote(symbol);
+            return getOptionQuote(symbol, token);
         case 'future':
-            return getFutureQuote(symbol);
+            return getFutureQuote(symbol, token);
         default:
             throw new Error('未知symbol类型: ' + symbol);
     }
