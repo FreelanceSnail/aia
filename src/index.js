@@ -120,7 +120,7 @@ app.all('/api/indicators', async (c) => {
 // 行情刷新（示例，实际应接入行情刷新逻辑）
 app.post('/api/refresh', async (c) => {
   const tushareToken = c.env.TUSHARE_TOKEN;
-  const symbols = (await c.env.DB.prepare('SELECT DISTINCT symbol FROM positions').all()).map(r => r.symbol);
+  let symbols = (await c.env.DB.prepare('SELECT DISTINCT symbol FROM positions').all()).map(r => r.symbol);
   symbols = symbols.filter(s => s !== 'cash');
   console.log(`Refreshing ${symbols.length} symbols...`);
   for (const symbol of symbols) {
