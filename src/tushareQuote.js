@@ -8,15 +8,10 @@ import axios from 'axios';
 const BASE_URL = 'https://api.tushare.pro';
 
 /**
- * 获取股票报价
- * @param {string} symbol 股票代码
- * @param {string} token tushare token
- * @returns {Promise<{ts_code: string, price: number, preclose: number} | null>} 行情数据字典，查不到返回 null
- */
-/**
  * 通用 tushare 行情查询
- * @param {object} body 查询参数对象
- * @returns {Promise<{ts_code: string, price: number, preclose: number} | null>}
+ * @param {object} body 查询参数对象，需包含api_name、token、params、fields
+ * @returns {Promise<{ts_code: string, price: number, preclose: number, trade_date?: string} | null>} 查询结果字典，查不到返回 null
+ * @throws {Error} tushare API异常时抛出
  */
 async function queryTushareQuote(body) {
     const res = await axios.post(BASE_URL, body);
@@ -39,7 +34,12 @@ async function queryTushareQuote(body) {
     }
 }
 
-// 查询 body 模板
+/**
+ * 股票查询参数模板
+ * @param {string} symbol 股票ts_code
+ * @param {string} token tushare token
+ * @returns {object} tushare股票查询参数
+ */
 export const STOCK_QUERY_BODY = (symbol, token) => ({
     api_name: 'daily',
     token,
@@ -47,6 +47,12 @@ export const STOCK_QUERY_BODY = (symbol, token) => ({
     fields: ''
 });
 
+/**
+ * 期权查询参数模板
+ * @param {string} symbol 期权ts_code
+ * @param {string} token tushare token
+ * @returns {object} tushare期权查询参数
+ */
 export const OPTION_QUERY_BODY = (symbol, token) => ({
     api_name: 'opt_daily',
     token,
@@ -54,6 +60,12 @@ export const OPTION_QUERY_BODY = (symbol, token) => ({
     fields: ''
 });
 
+/**
+ * 期货查询参数模板
+ * @param {string} symbol 期货ts_code
+ * @param {string} token tushare token
+ * @returns {object} tushare期货查询参数
+ */
 export const FUTURE_QUERY_BODY = (symbol, token) => ({
     api_name: 'fut_daily',
     token,
@@ -91,10 +103,11 @@ function detectSymbolType(symbol) {
 }
 
 /**
- * 通用报价接口，自动识别symbol类型
- * @param {string} symbol 代码
+ * 通用报价接口，自动识别symbol类型（股票、期权、期货）
+ * @param {string} symbol 证券/合约代码（支持股票、期权、期货）
  * @param {string} token tushare token
- * @returns {Promise<{ts_code: string, price: number, preclose: number} | null>} 行情数据字典，查不到返回 null
+ * @returns {Promise<{ts_code: string, price: number, preclose: number, trade_date?: string} | null>} 查询结果字典，查不到返回 null
+ * @throws {Error} symbol类型无法识别或tushare API异常时抛出
  */
 async function getQuote(symbol, token) {
     const type = detectSymbolType(symbol);
