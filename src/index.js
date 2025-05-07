@@ -49,9 +49,9 @@ app.get('/', (c) =>
 // 简要持仓数据
 app.get('/api/positions/summary', async (c) => {
   const { results } = await c.env.DB.prepare(`
-    SELECT symbol, name, type, portfolio, current_price, preclose_price, market_value_rate, equalled_market_value_rate, style
+    SELECT symbol, name, type, portfolio, price, preclose, market_value_rate, equalled_market_value_rate, style
     FROM positions
-    ORDER BY updated_at DESC
+    ORDER BY portfolio DESC
   `).all();
   return c.json(results);
 });
@@ -80,7 +80,7 @@ app.all('/api/positions/detail', async (c) => {
 
   if (providedPassword && providedPassword === expectedPassword) {
     // 密码匹配，返回数据
-    const { results } = await c.env.DB.prepare('SELECT * FROM positions ORDER BY updated_at DESC').all();
+    const { results } = await c.env.DB.prepare('SELECT * FROM positions ORDER BY portfolio DESC').all();
     return c.json(results);
   } else {
     // 密码不匹配或未提供

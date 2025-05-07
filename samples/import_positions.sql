@@ -1,6 +1,6 @@
 -- 下面为 positions.csv 的全部数据自动生成的 SQL 插入语句
 INSERT INTO positions (
-  id, symbol, name, type, current_price, preclose_price, account, portfolio, quantity, cost_price, exchange, margin_ratio, point_value, target_symbol, updated_at, market_value_rate, equalled_market_value_rate, market_value, equalled_market_value, style, cost, delta, profit, daily_profit
+  id, symbol, name, type, price, preclose, account, portfolio, quantity, cost_price, exchange, margin_ratio, point_value, target_symbol, updated_at, market_value_rate, equalled_market_value_rate, market_value, equalled_market_value, style, cost, delta, profit, daily_profit
 ) VALUES
 (1, '518880.SH', '黄金ETF', 'etf', 7.3240, 7.3270, '国信证券', '动量轮动策略', 73700.00, 6.7788, '1.0', 1.00, 1.00, NULL, '2025-04-22 20:03:19', 0.12, 0.07, 539778.80, 539778.80, '贵金属', 499597.56, 1.00, 40181.24, -221.10),
 (2, 'cash', '国信证券余额', 'cash', 1.0000, 1.0000, '国信证券', '动量轮动策略', 410.92, 1.0000, '1.0', 1.00, 1.00, NULL, '2025-04-22 20:03:19', 0.00, 0.00, 410.92, 410.92, '现金', 410.92, 1.00, 0.00, 0.00),
