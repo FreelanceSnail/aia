@@ -15,19 +15,17 @@
 1. 安装依赖：`npm install`
 2. 初始化 D1 数据库：
    ```
-   wrangler d1 migrations apply aia_db
+   npx wrangler d1 migrations apply aia_db
    # 导入示例数据
-   wrangler d1 execute aia_db --file=samples/import_target_symbols.sql
-   wrangler d1 execute aia_db --file=samples/import_positions.sql
+   npx wrangler d1 execute aia_db --file=samples/import_target_symbols.sql
+   npx wrangler d1 execute aia_db --file=samples/import_positions.sql
    ```
-3. 启动开发服务器：
-   ```
-   npm run dev
-   ```
+3. 启动开发服务器：`npx wrangler dev`
+   
 
 ## 部署
 ```
-npm run deploy
+push到origin/master分支上触发自动部署
 ```
 
 ---
