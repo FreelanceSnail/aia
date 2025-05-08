@@ -43,7 +43,7 @@ async function queryTushareQuote(body) {
 export const STOCK_QUERY_BODY = (symbol, token) => ({
     api_name: 'daily',
     token,
-    params: { ts_code: symbol },
+    params: { ts_code: symbol, limit: 1 },
     fields: ''
 });
 
@@ -56,7 +56,7 @@ export const STOCK_QUERY_BODY = (symbol, token) => ({
 export const OPTION_QUERY_BODY = (symbol, token) => ({
     api_name: 'opt_daily',
     token,
-    params: { ts_code: symbol },
+    params: { ts_code: symbol, limit: 1 },
     fields: ''
 });
 
@@ -69,7 +69,20 @@ export const OPTION_QUERY_BODY = (symbol, token) => ({
 export const FUTURE_QUERY_BODY = (symbol, token) => ({
     api_name: 'fut_daily',
     token,
-    params: { ts_code: symbol },
+    params: { ts_code: symbol, limit: 1 },
+    fields: ''
+});
+
+/**
+ * 基金查询参数模板
+ * @param {string} symbol 场内基金ts_code
+ * @param {string} token tushare token
+ * @returns {object} tushare基金查询参数
+ */
+export const ETFLOF_QUERY_BODY = (symbol, token) => ({
+    api_name: 'fund_daily',
+    token,
+    params: { ts_code: symbol, limit: 1 },
     fields: ''
 });
 
@@ -77,29 +90,43 @@ export const FUTURE_QUERY_BODY = (symbol, token) => ({
 /**
  * 检测symbol类型
  * @param {string} symbol
- * @returns {'stock'|'option'|'future'}
+ * @returns {'indice'|'etflof'|'stock'|'option'|'ofund'|'future'|'us_stock'|'unkown'}
  */
 function detectSymbolType(symbol) {
-    // 1. 先判断沪深交易所的股票
+    // 1. 判断指数（000开头六位数字.SH 或 399开头六位数字.SZ）
+    if (/^000\d{3}\.SH$/i.test(symbol) || /^399\d{3}\.SZ$/i.test(symbol)) {
+        return 'indice';
+    }
+    // 2. 判断沪深交易所的场内基金（5开头六位数字.SH 或 1开头六位数字.SZ）
+    if (/^5\d{5}\.SH$/i.test(symbol) || /^1\d{5}\.SZ$/i.test(symbol)) {
+        return 'etflof';
+    }
+    // 3. 判断沪深交易所的股票（0、3、6开头六位数字+.SH或.SZ结尾）
     if (/^[036]\d{5}\.(SH|SZ)$/i.test(symbol)) {
         return 'stock';
     }
-    // 2. 沪深交易所的期权
+    // 4. 判断沪深交易所的期权（1开头八位数字+.SH或.SZ结尾）
     if (/^1\d{7}\.(SH|SZ)$/i.test(symbol)) {
         return 'option';
     }
-    // 3. 期货/期权（中金所、大商所、上期所、郑商所、能源中心等）
-    // 期权合约一般带有 -C- 或 -P- 或 -C 或 -P
+    // 5. 判断场外基金（.OF结尾）
+    if (/\.OF$/i.test(symbol)) {
+        return 'ofund';
+    }
+    // 6. 判断期权合约（带有-C-/-P-或-C/-P等）
     // 例：IO2509-C-3800.CFX、IO2509-P-3800.CFX、SR3012P4800.CZC、AU.SHF
     if (/-(C|P)-/i.test(symbol) || /-(C|P)\d*/i.test(symbol)) {
-        // 期权合约
         return 'option';
     }
-    // 期货合约（如 IC2512.CFX, AU.SHF, SR3012.CZC, etc.）
+    // 7. 判断期货合约（如 IC2512.CFX, AU.SHF, SR3012.CZC, etc.）
     if (/^[A-Za-z0-9\-]+\.[A-Z]+$/i.test(symbol)) {
         return 'future';
     }
-    throw new Error('无法识别symbol类型: ' + symbol);
+    // 8. 判断美股（纯字母且没有“.”）
+    if (/^[A-Za-z]+$/.test(symbol)) {
+        return 'us_stock';
+    }
+    return 'unkown';
 }
 
 /**
@@ -119,9 +146,8 @@ async function getQuote(symbol, token) {
         case 'future':
             return queryTushareQuote(FUTURE_QUERY_BODY(symbol, token));
         default:
-            throw new Error('未知symbol类型: ' + symbol);
+            return null;
     }
 }
 
 export { getQuote };
-
