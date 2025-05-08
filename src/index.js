@@ -117,16 +117,16 @@ app.all('/api/indicators', async (c) => {
   return c.json(data);
 });
 
-// 行情刷新（示例，实际应接入行情刷新逻辑）
-app.post('/api/refresh', async (c) => {
+// 行情刷新
+app.all('/api/refresh', async (c) => {
   const tushareToken = c.env.TUSHARE_TOKEN;
-  let symbols = (await c.env.DB.prepare('SELECT DISTINCT symbol FROM positions').all()).map(r => r.symbol);
-  symbols = symbols.filter(s => s !== 'cash');
+  const result = await c.env.DB.prepare('SELECT DISTINCT symbol FROM positions WHERE symbol != "cash"').all();
+  const symbols = result.results.map(r => r.symbol);
   console.log(`Refreshing ${symbols.length} symbols...`);
   for (const symbol of symbols) {
     const quote = await getQuote(symbol, tushareToken);
     if (quote) {
-      await c.env.DB.prepare('UPDATE positions SET current_price = ?, preclose_price = ?, updated_at = ? WHERE symbol = ?').run(
+      await c.env.DB.prepare('UPDATE positions SET price = ?, preclose = ?, updated_at = ? WHERE symbol = ?').run(
         quote.price,
         quote.preclose,
         new Date().toISOString(),
