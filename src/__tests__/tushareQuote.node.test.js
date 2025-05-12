@@ -22,10 +22,12 @@ function loadTushareToken() {
 }
 
 const symbols = [
+  '000001.SH', // 指数代码，测试 indice 分支
   '000001.SZ',
   'AU.SHF',
   'IC2512.CFX',
   'IO2509-C-3800.CFX',
+  '518880.SH'
 ];
 
 for (const symbol of symbols) {
@@ -37,4 +39,3 @@ for (const symbol of symbols) {
     assert.equal(result.ts_code, symbol);
   });
 }
-

@@ -86,6 +86,18 @@ export const ETFLOF_QUERY_BODY = (symbol, token) => ({
     fields: ''
 });
 
+/**
+ * 指数查询参数模板
+ * @param {string} symbol 指数ts_code
+ * @param {string} token tushare token
+ * @returns {object} tushare指数查询参数
+ */
+export const INDEX_QUERY_BODY = (symbol, token) => ({
+    api_name: 'index_daily',
+    token,
+    params: { ts_code: symbol, limit: 1 },
+    fields: ''
+});
 
 /**
  * 检测symbol类型
@@ -145,6 +157,10 @@ async function getQuote(symbol, token) {
             return queryTushareQuote(OPTION_QUERY_BODY(symbol, token));
         case 'future':
             return queryTushareQuote(FUTURE_QUERY_BODY(symbol, token));
+        case 'etflof':
+            return queryTushareQuote(ETFLOF_QUERY_BODY(symbol, token));
+        case 'indice':
+            return queryTushareQuote(INDEX_QUERY_BODY(symbol, token));
         default:
             return null;
     }
