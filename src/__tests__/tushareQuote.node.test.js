@@ -23,11 +23,11 @@ function loadTushareToken() {
 
 const symbols = [
   '000001.SH', // 指数代码，测试 indice 分支
-  '000001.SZ',
-  'AU.SHF',
-  'IC2512.CFX',
-  'IO2509-C-3800.CFX',
-  '518880.SH'
+  '000001.SZ', // 股票代码，测试 stock 分支
+  'AU.SHF', // 期货代码，测试 future 分支
+  'IC2512.CFX', // 期货代码，测试 future 分支
+  'IO2509-C-3800.CFX', // 期权代码，测试 option 分支
+  '518880.SH', // 场内基金代码，测试 etflof 分支
 ];
 
 for (const symbol of symbols) {
