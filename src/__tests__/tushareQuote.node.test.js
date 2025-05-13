@@ -28,7 +28,9 @@ const symbols = [
   'IC2512.CFX', // 股指期货代码，测试 future 分支
   'IO2509-C-3800.CFX', // 股指期权代码，测试 option 分支
   '10008809.SH', // 交易所期权代码，测试 option 分支
-  '518880.SH' // 场内基金代码，测试 etflof 分支
+  '518880.SH', // 场内基金代码，测试 etflof 分支
+  '217022.OF', // 场外基金代码，测试 ofund 分支
+  'UVIX', // 美股代码，测试 us_stock 分支
 ];
 
 for (const symbol of symbols) {
@@ -47,7 +49,7 @@ test('getQuote 对于无效代码返回 null', async (t) => {
   assert.equal(result, null);
 });
 
-test('getQuote 对于美股代码返回 null', async (t) => {
-  const result = await getQuote('AAPL', 'dummy-token');
+test('getQuote 对于未适配代码968103.HKOF返回 null', async (t) => {
+  const result = await getQuote('968103.HKOF', 'dummy-token');
   assert.equal(result, null);
 });

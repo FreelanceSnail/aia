@@ -100,6 +100,63 @@ export const INDEX_QUERY_BODY = (symbol, token) => ({
 });
 
 /**
+ * 场外基金查询参数模板
+ * @param {string} symbol 场外基金ts_code
+ * @param {string} token tushare token
+ * @returns {object} tushare场外基金查询参数
+ */
+export const OFUND_QUERY_BODY = (symbol, token) => ({
+    api_name: 'fund_nav',
+    token,
+    params: { ts_code: symbol, limit: 2 },
+    fields: ''
+});
+
+/**
+ * 美股行情查询，通过雅虎财经WEB API
+ * @param {string} symbol 美股代码
+ * @returns {Promise<{ts_code: string, price: number, preclose: number, trade_date?: string} | null>}
+ */
+async function queryYahooQuote(symbol) {
+    const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbol}`;
+    const res = await axios.get(url);
+    const result = res.data.quoteResponse?.result;
+    if (!result || result.length === 0) return null;
+    const quote = result[0];
+    const price = quote.regularMarketPrice;
+    const preclose = quote.regularMarketPreviousClose;
+    const time = quote.regularMarketTime;
+    const trade_date = time ? new Date(time * 1000).toISOString().slice(0,10).replace(/-/g,'') : undefined;
+    return { ts_code: symbol, price, preclose, trade_date };
+}
+
+/**
+ * 场外基金净值查询
+ * @param {object} body 查询参数对象
+ * @returns {Promise<{ts_code: string, price: number, preclose: number, trade_date?: string} | null>}
+ */
+async function queryFundNav(body) {
+    const res = await axios.post(BASE_URL, body);
+    if (res.data && res.data.code === 0) {
+        const { fields, items } = res.data.data || {};
+        if (!fields || !items || items.length === 0) return null;
+        const idx_ts_code = fields.indexOf('ts_code');
+        const idx_nav = fields.indexOf('unit_nav');
+        const idx_nav_date = fields.indexOf('nav_date');
+        const latest = items[0];
+        const prev = items[1] || latest;
+        return {
+            ts_code: latest[idx_ts_code],
+            price: latest[idx_nav],
+            preclose: prev[idx_nav],
+            trade_date: idx_nav_date !== -1 ? latest[idx_nav_date] : undefined
+        };
+    } else {
+        throw new Error(res.data.msg || 'Tushare API error');
+    }
+}
+
+/**
  * 检测symbol类型
  * @param {string} symbol
  * @returns {'indice'|'etflof'|'stock'|'option'|'ofund'|'future'|'us_stock'|'unkown'}
@@ -161,6 +218,10 @@ async function getQuote(symbol, token) {
             return queryTushareQuote(ETFLOF_QUERY_BODY(symbol, token));
         case 'indice':
             return queryTushareQuote(INDEX_QUERY_BODY(symbol, token));
+        case 'ofund':
+            return queryFundNav(OFUND_QUERY_BODY(symbol, token));
+        case 'us_stock':
+            return queryYahooQuote(symbol);
         default:
             return null;
     }
