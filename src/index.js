@@ -120,23 +120,31 @@ app.all('/api/indicators', async (c) => {
 // 行情刷新
 app.all('/api/refresh', async (c) => {
   const outputs = [];
-  const tushareToken = c.env.TUSHARE_TOKEN;
+  const tushareToken = c.env.API_TUSHARE_TOKEN;
+  if (!tushareToken) {
+    return c.json({ status: 'error', message: 'Tushare token not found in environment variables' }, 500);
+  }
   const result = await c.env.DB.prepare('SELECT DISTINCT symbol FROM positions WHERE symbol != "cash"').all();
   const symbols = result.results.map(r => r.symbol);
   outputs.push(`Refreshing ${symbols.length} symbols...`);
   for (const symbol of symbols) {
     const quote = await getQuote(symbol, tushareToken);
     if (quote) {
-      await c.env.DB.prepare('UPDATE positions SET price = ?, preclose = ?, updated_at = ? WHERE symbol = ?').run(
-        quote.price,
-        quote.preclose,
-        new Date().toISOString(),
-        symbol
-      );
+      await c.env.DB
+        .prepare(
+          'UPDATE positions SET price = ?, preclose = ?, updated_at = ? WHERE symbol = ?'
+        )
+        .bind(
+          quote.price,
+          quote.preclose,
+          new Date().toISOString(),
+          symbol
+        )
+        .run();
       outputs.push(`Updated ${symbol}: price=${quote.price}, preclose=${quote.preclose}, trade_date=${quote.trade_date}`);
     }
   }
-  return c.json({ status: 'ok', refreshed_at: new Date().toISOString(), output: outputs.join('\n') });
+  return c.json({ status: 'ok', refreshed_at: new Date().toISOString(), output: outputs });
 });
 
 export default app;
