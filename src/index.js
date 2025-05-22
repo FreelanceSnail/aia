@@ -9,7 +9,8 @@ const allowedOrigins = [
   'http://localhost:4000',
   'http://127.0.0.1:4000',
   'https://freelancesnail.github.io',
-  'https://snail-cafe.cn'
+  'https://snail-cafe.cn',
+  'https://freelancesnail-github-io.pages.dev'
 ];
 
 app.use('*', cors({
