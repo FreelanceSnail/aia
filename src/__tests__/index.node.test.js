@@ -1,4 +1,5 @@
 // node --test src/__tests__/index.node.test.js
+// debug: node --test --trace-warnings src/__tests__/index.node.test.js
 import { test } from 'node:test';
 import { getQuote, loadTushareToken } from '../tushareQuote.js';
 

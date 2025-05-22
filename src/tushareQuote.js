@@ -25,13 +25,16 @@ async function queryTushareQuote(body) {
         const idx_preclose = fields.indexOf('pre_close');
         const row = items[0];
         const idx_trade_date = fields.indexOf('trade_date');
-        return {
+        const rlt = {
             ts_code: row[idx_ts_code],
             price: row[idx_close],
             preclose: row[idx_preclose],
             trade_date: idx_trade_date !== -1 ? row[idx_trade_date] : undefined
-        };
+        }
+        console.debug(`Got symbol ${rlt.ts_code}: price=${rlt.price}, preclose=${rlt.preclose}, trade_date=${rlt.trade_date}`);
+        return rlt;
     } else {
+        console.error(`Tushare API error: ${res.data.msg}`);
         throw new Error(res.data.msg || 'Tushare API error');
     }
 }
@@ -222,8 +225,8 @@ async function getQuote(symbol, token) {
             return queryTushareQuote(INDEX_QUERY_BODY(symbol, token));
         case 'ofund':
             return queryFundNav(OFUND_QUERY_BODY(symbol, token));
-        case 'us_stock':
-            return queryYahooQuote(symbol);
+        //case 'us_stock':
+        //    return queryYahooQuote(symbol);
         default:
             return null;
     }
