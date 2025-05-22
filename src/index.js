@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-
+import { getQuote } from './tushareQuote.js';
 // Cloudflare D1 数据库通过 c.env.DB 访问
 const app = new Hono();
 
@@ -119,10 +119,11 @@ app.all('/api/indicators', async (c) => {
 
 // 行情刷新
 app.all('/api/refresh', async (c) => {
+  const outputs = [];
   const tushareToken = c.env.TUSHARE_TOKEN;
   const result = await c.env.DB.prepare('SELECT DISTINCT symbol FROM positions WHERE symbol != "cash"').all();
   const symbols = result.results.map(r => r.symbol);
-  console.log(`Refreshing ${symbols.length} symbols...`);
+  outputs.push(`Refreshing ${symbols.length} symbols...`);
   for (const symbol of symbols) {
     const quote = await getQuote(symbol, tushareToken);
     if (quote) {
@@ -132,10 +133,10 @@ app.all('/api/refresh', async (c) => {
         new Date().toISOString(),
         symbol
       );
-      console.log(`Updated ${symbol}: price=${quote.price}, preclose=${quote.preclose}, trade_date=${quote.trade_date}`);
+      outputs.push(`Updated ${symbol}: price=${quote.price}, preclose=${quote.preclose}, trade_date=${quote.trade_date}`);
     }
   }
-  return c.json({ status: 'ok', refreshed_at: new Date().toISOString() });
+  return c.json({ status: 'ok', refreshed_at: new Date().toISOString(), output: outputs.join('\n') });
 });
 
 export default app;

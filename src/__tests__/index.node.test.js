@@ -1,15 +1,16 @@
 // node --test src/__tests__/index.node.test.js
 // debug: node --test --trace-warnings src/__tests__/index.node.test.js
 import { test } from 'node:test';
-import { getQuote, loadTushareToken } from '../tushareQuote.js';
+import { getQuote } from '../tushareQuote.js';
+import { loadTushareToken } from './test.util.js';
 
 test('Integration: /api/refresh updates positions', async () => {
   const tushareToken = loadTushareToken();
   const symbols = [
     "518880.SH",
-    "AG2506.SHF",
-    "IC2506.CFX",
-    "M2505.DCE",
+    "AG2509.SHF",
+    "IC2509.CFX",
+    "M2603.DCE",
     "021177.OF",
     "008114.OF",
     "007937.OF",

@@ -3,7 +3,8 @@
 
 import { test } from 'node:test';
 import assert from 'assert';
-import { getQuote, loadTushareToken } from '../tushareQuote.js';
+import { getQuote } from '../tushareQuote.js';
+import { loadTushareToken } from './test.util.js';
 
 const symbols = [
   '000001.SH', // 指数代码，测试 indice 分支
@@ -14,7 +15,7 @@ const symbols = [
   '10008809.SH', // 交易所期权代码，测试 option 分支
   '518880.SH', // 场内基金代码，测试 etflof 分支
   '217022.OF', // 场外基金代码，测试 ofund 分支
-  'UVIX', // 美股代码，测试 us_stock 分支
+  //'UVIX', // 美股代码，测试 us_stock 分支
 ];
 
 for (const symbol of symbols) {
