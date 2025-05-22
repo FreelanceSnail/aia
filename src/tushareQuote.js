@@ -35,7 +35,7 @@ async function queryTushareQuote(body) {
         return rlt;
     } else {
         console.error(`Tushare API error: ${res.data.msg}`);
-        throw new Error(res.data.msg || 'Tushare API error');
+        return null;
     }
 }
 
@@ -123,16 +123,22 @@ export const OFUND_QUERY_BODY = (symbol, token) => ({
  * @returns {Promise<{ts_code: string, price: number, preclose: number, trade_date?: string} | null>}
  */
 async function queryYahooQuote(symbol) {
-    const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbol}`;
-    const res = await axios.get(url);
-    const result = res.data.quoteResponse?.result;
-    if (!result || result.length === 0) return null;
-    const quote = result[0];
-    const price = quote.regularMarketPrice;
-    const preclose = quote.regularMarketPreviousClose;
-    const time = quote.regularMarketTime;
-    const trade_date = time ? new Date(time * 1000).toISOString().slice(0,10).replace(/-/g,'') : undefined;
-    return { ts_code: symbol, price, preclose, trade_date };
+    try {
+        const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbol}`;
+        const res = await axios.get(url);
+        const result = res.data.quoteResponse?.result;
+        if (!result || result.length === 0) return null;
+        const quote = result[0];
+        const price = quote.regularMarketPrice;
+        const preclose = quote.regularMarketPreviousClose;
+        const time = quote.regularMarketTime;
+        const trade_date = time ? new Date(time * 1000).toISOString().slice(0,10).replace(/-/g,'') : undefined;
+        console.debug(`Got symbol ${symbol}: price=${price}, preclose=${preclose}, trade_date=${trade_date}`);
+        return { ts_code: symbol, price, preclose, trade_date };
+    } catch (error) {
+        console.error(`queryYahooQuote error for symbol ${symbol}:`, error);
+        return null;
+    }
 }
 
 /**
@@ -150,14 +156,17 @@ async function queryFundNav(body) {
         const idx_nav_date = fields.indexOf('nav_date');
         const latest = items[0];
         const prev = items[1] || latest;
-        return {
+        const rlt = {
             ts_code: latest[idx_ts_code],
             price: latest[idx_nav],
             preclose: prev[idx_nav],
             trade_date: idx_nav_date !== -1 ? latest[idx_nav_date] : undefined
         };
+        console.debug(`Got symbol ${rlt.ts_code}: price=${rlt.price}, preclose=${rlt.preclose}, trade_date=${rlt.trade_date}`);
+        return rlt;
     } else {
-        throw new Error(res.data.msg || 'Tushare API error');
+        console.error(`Tushare API error: ${res.data.msg}`);
+        return null;
     }
 }
 
@@ -225,8 +234,8 @@ async function getQuote(symbol, token) {
             return queryTushareQuote(INDEX_QUERY_BODY(symbol, token));
         case 'ofund':
             return queryFundNav(OFUND_QUERY_BODY(symbol, token));
-        //case 'us_stock':
-        //    return queryYahooQuote(symbol);
+        case 'us_stock':
+            return queryYahooQuote(symbol);
         default:
             return null;
     }
