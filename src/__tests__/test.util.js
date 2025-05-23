@@ -6,7 +6,13 @@ import path from 'path';
  * @returns {string} API_TUSHARE_TOKEN
  */
 function loadTushareToken() {
-    const envPath = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../../.dev.vars');
+    // 修复 Windows 路径问题
+    let pathname = new URL(import.meta.url).pathname;
+    // 在 Windows 上，pathname 可能以 /D:/ 开头，需要去掉前导斜杠
+    if (process.platform === 'win32' && pathname.startsWith('/')) {
+        pathname = pathname.substring(1);
+    }
+    const envPath = path.resolve(path.dirname(pathname), '../../.dev.vars');
     if (!fs.existsSync(envPath)) {
         throw new Error(`未找到 .dev.vars 文件: ${envPath}`);
     }

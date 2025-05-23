@@ -125,11 +125,12 @@ app.all('/api/refresh', async (c) => {
   if (!tushareToken) {
     return c.json({ status: 'error', message: 'Tushare token not found in environment variables' }, 500);
   }
-  const result = await c.env.DB.prepare('SELECT DISTINCT symbol FROM positions WHERE symbol != "cash"').all();
-  const symbols = result.results.map(r => r.symbol);
-  outputs.push(`Refreshing ${symbols.length} symbols...`);
-  for (const symbol of symbols) {
-    const quote = await getQuote(symbol, tushareToken);
+  const result = await c.env.DB.prepare('SELECT DISTINCT symbol, type FROM positions WHERE symbol != "cash"').all();
+  const symbolsWithType = result.results.map(r => ({ symbol: r.symbol, type: r.type }));
+  outputs.push(`Refreshing ${symbolsWithType.length} symbols...`);
+  for (const item of symbolsWithType) {
+    const { symbol, type } = item;
+    const quote = await getQuote(symbol, type, tushareToken);
     if (quote) {
       await c.env.DB
         .prepare(
