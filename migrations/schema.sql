@@ -9,7 +9,6 @@ CREATE TABLE IF NOT EXISTS target_symbols (
 
 -- positions 表
 CREATE TABLE IF NOT EXISTS positions (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
   symbol TEXT,
   name TEXT,
   type TEXT,
@@ -22,7 +21,7 @@ CREATE TABLE IF NOT EXISTS positions (
   exchange TEXT,
   margin_ratio REAL,
   point_value REAL,
-  target_symbol TEXT,
+  target_symbol TEXT REFERENCES target_symbols(symbol),
   updated_at TEXT,
   market_value_rate REAL,
   equalled_market_value_rate REAL,
@@ -33,5 +32,6 @@ CREATE TABLE IF NOT EXISTS positions (
   delta REAL,
   profit REAL,
   daily_profit REAL,
-  FOREIGN KEY (target_symbol) REFERENCES target_symbols(symbol)
-);
+  trade_date TEXT,
+  PRIMARY KEY (symbol, account, portfolio)
+) WITHOUT ROWID;
