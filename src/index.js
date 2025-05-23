@@ -134,12 +134,13 @@ app.all('/api/refresh', async (c) => {
     if (quote) {
       await c.env.DB
         .prepare(
-          'UPDATE positions SET price = ?, preclose = ?, updated_at = ? WHERE symbol = ?'
+          'UPDATE positions SET price = ?, preclose = ?, trade_date = ?, updated_at = ? WHERE symbol = ?'
         )
         .bind(
           quote.price,
           quote.preclose,
-          new Date().toISOString(),
+          quote.trade_date,
+          new Date(Date.now() + 8 * 3600000).toISOString().replace('Z', '+08:00'),
           symbol
         )
         .run();

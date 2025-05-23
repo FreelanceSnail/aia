@@ -10,7 +10,7 @@ test('Integration: /api/refresh updates positions', async () => {
     {symbol:"518880.SH",type:"etflof"},
     {symbol:"AG2509.SHF",type:"future"},
     {symbol:"IC2509.CFX",type:"future"},
-    {symbol:"M2603.DCE",type:"future"},
+    {symbol:"M2505.DCE",type:"future"},
     {symbol:"021177.OF",type:"fund"},
     {symbol:"008114.OF",type:"fund"},
     {symbol:"007937.OF",type:"fund"},
@@ -30,7 +30,14 @@ test('Integration: /api/refresh updates positions', async () => {
     const { symbol, type } = item;
     const quote = await getQuote(symbol, type, tushareToken);
     if (quote) {
-      updates.push(`UPDATE positions SET price = ${quote.price}, preclose = ${quote.preclose}, updated_at = '${new Date().toISOString()}' WHERE symbol = '${symbol}';`);
+      updates.push(
+        `UPDATE positions SET ` +
+        `price = ${quote.price}, ` +
+        `preclose = ${quote.preclose}, ` +
+        `trade_date = ${quote.trade_date}, ` +
+        `updated_at = '${new Date(Date.now() + 8 * 3600000).toISOString().replace('Z', '+08:00')}' ` +
+        `WHERE symbol = '${symbol}';`
+      );
     }
   }
   console.log(updates.join('\n'));
