@@ -118,6 +118,11 @@ app.all('/api/indicators', async (c) => {
   return c.json(data);
 });
 
+// 获取当前UTC+8时区的时间
+function getCurrUTC8Time() {
+  return new Date(Date.now() + 8 * 3600000).toISOString().replace('Z', '+08:00');
+}
+
 // 行情刷新
 app.all('/api/refresh', async (c) => {
   const outputs = [];
@@ -140,14 +145,14 @@ app.all('/api/refresh', async (c) => {
           quote.price,
           quote.preclose,
           quote.trade_date,
-          new Date(Date.now() + 8 * 3600000).toISOString().replace('Z', '+08:00'),
+          getCurrUTC8Time(),
           symbol
         )
         .run();
       outputs.push(`Updated ${symbol}: price=${quote.price}, preclose=${quote.preclose}, trade_date=${quote.trade_date}`);
     }
   }
-  return c.json({ status: 'ok', refreshed_at: new Date().toISOString(), output: outputs });
+  return c.json({ status: 'ok', refreshed_at: getCurrUTC8Time(), output: outputs });
 });
 
 export default app;
