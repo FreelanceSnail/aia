@@ -33,5 +33,5 @@ CREATE TABLE IF NOT EXISTS positions (
   profit REAL,
   daily_profit REAL,
   trade_date TEXT,
-  PRIMARY KEY (symbol, account, portfolio)
+  PRIMARY KEY (symbol, type, account, portfolio)
 ) WITHOUT ROWID;

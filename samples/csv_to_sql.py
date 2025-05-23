@@ -9,13 +9,13 @@ TABLE_NAME = 'positions'
 
 # 需要输出的字段顺序（与数据库 schema 对齐）
 COLUMNS = [
-    'id', 'symbol', 'name', 'type', 'current_price', 'preclose_price', 'account', 'portfolio', 'quantity', 'avg_price',
+    'symbol', 'name', 'type', 'price', 'preclose', 'account', 'portfolio', 'quantity', 'cost_price',
     'exchange', 'margin_ratio', 'point_value', 'target_symbol', 'updated_at', 'market_value_rate',
     'equalled_market_value_rate', 'market_value', 'equalled_market_value', 'style', 'cost', 'delta', 'profit', 'daily_profit'
 ]
 
 # 需要格式化为四位小数的字段
-FOUR_DECIMAL_FIELDS = {'current_price', 'preclose_price', 'avg_price'}
+FOUR_DECIMAL_FIELDS = {'price', 'preclose', 'cost_price'}
 # 需要格式化为两位小数的字段
 TWO_DECIMAL_FIELDS = {
     'quantity', 'margin_ratio', 'point_value', 'market_value_rate', 'equalled_market_value_rate',
@@ -35,8 +35,6 @@ def format_value(col: str, val: str):
             return f"{float(val):.2f}"
         except Exception:
             return 'NULL'
-    if col in ['id']:
-        return str(int(float(val)))
     if col.startswith('updated_at'):
         return f"'{val}'"
     if col in ['symbol', 'name', 'type', 'account', 'portfolio', 'exchange', 'target_symbol', 'style']:
