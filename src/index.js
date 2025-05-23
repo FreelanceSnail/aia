@@ -136,6 +136,16 @@ app.all('/api/refresh', async (c) => {
   for (const item of symbolsWithType) {
     const { symbol, type } = item;
     const quote = await getQuote(symbol, type, tushareToken);
+    /* TODO: 基于获取到的quote，更新positions表中各持仓的以下字段：
+     * market_value
+     * market_value_rate
+     * equalled_market_value
+     * equalled_market_value_rate
+     * cost
+     * profit
+     * daily_profit
+     */
+    
     if (quote) {
       await c.env.DB
         .prepare(
